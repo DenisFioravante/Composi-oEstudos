@@ -1,0 +1,341 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Copy of Untitled0.ipynb",
+      "version": "0.3.2",
+      "provenance": [],
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/DenisFioravante/Composi-oEstudos/blob/master/Solve\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "-56lBmy_UgMj",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 221
+        },
+        "outputId": "2c16c419-9d0c-4364-e12f-b49eec7e7baf"
+      },
+      "source": [
+        "!pip install pymprog #instlar o pymprog"
+      ],
+      "execution_count": 3,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Collecting pymprog\n",
+            "\u001b[?25l  Downloading https://files.pythonhosted.org/packages/fb/b4/27e6dc89387535829127b8e577226f0a82215da174b451198312e0afe5d0/pymprog-1.1.2.tar.gz (44kB)\n",
+            "\u001b[K     |████████████████████████████████| 51kB 2.0MB/s \n",
+            "\u001b[?25hCollecting swiglpk>=1.4.4 (from pymprog)\n",
+            "\u001b[?25l  Downloading https://files.pythonhosted.org/packages/ff/37/b0375c9e9a1263820637050cdf8f9bf5cedff4e7fafd2f7f393b26c14150/swiglpk-4.65.0-cp36-cp36m-manylinux1_x86_64.whl (627kB)\n",
+            "\u001b[K     |████████████████████████████████| 634kB 8.0MB/s \n",
+            "\u001b[?25hBuilding wheels for collected packages: pymprog\n",
+            "  Building wheel for pymprog (setup.py) ... \u001b[?25l\u001b[?25hdone\n",
+            "  Stored in directory: /root/.cache/pip/wheels/fa/09/59/ef649891969b65ff8de663e7a0a65bf27ba0c273e2a0795a44\n",
+            "Successfully built pymprog\n",
+            "Installing collected packages: swiglpk, pymprog\n",
+            "Successfully installed pymprog-1.1.2 swiglpk-4.65.0\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "wDmWvJljW6s6",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 510
+        },
+        "outputId": "1a44cb88-b9a3-4a9d-a14a-91acac8d723b"
+      },
+      "source": [
+        "from pymprog import* #importar a biblioteca\n",
+        "\n",
+        "# parâmetros\n",
+        "r = [3,2] # receita de cada alicota\n",
+        "d = [3,1,3] # disponibilidade das matérias primas\n",
+        "a = [[0.5, 0.3],\n",
+        "    [0.1, 0.2],\n",
+        "    [0.4, 0.5]]# percentual das mtérias primas nas ligas\n",
+        "\n",
+        "n = len(r) #calcula o tamanho das liga (duas ligas)\n",
+        "m = len(d) #calcula o tamanho das materias primas\n",
+        "\n",
+        "begin('ligas')# inicia o modelo\n",
+        "verbose(True)# cria mais informação do modelo\n",
+        "\n",
+        "x = var('x',range(n))#range cria uma lista com o número de elementos da variável\n",
+        "\n",
+        "#modelo (FUNÇÃO OBJETIVA)\n",
+        "maximize(sum(r[i]*x[i] for i in range(n)))\n",
+        "\n",
+        "#restrições\n",
+        "\n",
+        "for j in range(n):\n",
+        "  sum(a[j][i]*x[i] for i in range(n)) <= d[j]\n",
+        "\n",
+        "  \n",
+        "#executar o modelo\n",
+        "solve()\n",
+        "\n",
+        "#resultado\n",
+        "#função objetiva\n",
+        "print('Valor Ótimo: {:.3f}'.format(vobj()))\n",
+        "# variáveis\n",
+        "\n",
+        "for i in range(n):\n",
+        "  print('x[{}]={:.3f}'.format(i+1,x[i].primal))\n",
+        "\n",
+        "  \n",
+        "sensitivity()  \n",
+        "\n",
+        "end()# fim do modelo"
+      ],
+      "execution_count": 19,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Max : 3 * x[0] + 2 * x[1]\n",
+            "R1: 0.5 * x[0] + 0.3 * x[1] <= 3\n",
+            "R2: 0.1 * x[0] + 0.2 * x[1] <= 1\n",
+            "Valor Ótimo: 18.571\n",
+            "x[1]=4.286\n",
+            "x[2]=2.857\n",
+            "\n",
+            "PyMathProg 1.0 Sensitivity Report Created: 2019/05/13 Mon 23:14PM\n",
+            "================================================================================\n",
+            "Variable            Activity   Dual.Value     Obj.Coef   Range.From   Range.Till\n",
+            "--------------------------------------------------------------------------------\n",
+            "*x[0]                4.28571            0            3            1      3.33333\n",
+            "*x[1]                2.85714            0            2          1.8            6\n",
+            "================================================================================\n",
+            "Note: rows marked with a * list a basic variable.\n",
+            "\n",
+            "================================================================================\n",
+            "Constraint       Activity Dual.Value  Lower.Bnd  Upper.Bnd RangeLower RangeUpper\n",
+            "--------------------------------------------------------------------------------\n",
+            " R1                     3    5.71429       -inf          3        1.5          5\n",
+            " R2                     1    1.42857       -inf          1        0.6          2\n",
+            "================================================================================\n",
+            "Note: normally, RangeLower is the min for the binding bound, and RangeUpper\n",
+            "gives the max value. However, when neither bounds are binding, the row is\n",
+            "marked with a *, and RangeLower is the max for Lower.Bnd(whose min is -inf),\n",
+            "and RangeUpper is the min for Upper.Bnd(whose max value is inf). Then the\n",
+            "columns of RangeLower, RangeUpper and Activity all have identical values.\n",
+            "\n"
+          ],
+          "name": "stdout"
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "model('ligas') is not the default model."
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 19
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "yOCpJRXGeuAq",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 394
+        },
+        "outputId": "360d8985-9531-4dfd-9ae2-71053f1197aa"
+      },
+      "source": [
+        "from pymprog import*\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n",
+        "D = [[1.3,2,2.5],\n",
+        "     [2.3,3.3,2.1]]#DEMANDA\n",
+        "\n",
+        "CP = [[1720,1690,1950],\n",
+        "     [1700,1850,2000]]#CUSTO DE PRODUÇÃO\n",
+        "\n",
+        "CE = [[230,200,200],\n",
+        "     [200,190,210]]#CUSTO DE ESTOQUE\n",
+        "\n",
+        "CR = [[100,150,200],#CUSTO E PREPARAÇÃO\n",
+        "     [200,190,210]]\n",
+        "\n",
+        "\n",
+        "n = 2 # numero de ligas\n",
+        "m = 3 # numero de período\n",
+        "\n",
+        "\n",
+        "#modelo\n",
+        "\n",
+        "begin('modelo')\n",
+        "verbose(True)# cria mais informação do modelo\n",
+        "\n",
+        "A = iprod(range(n), range(m)) #iprod faz o produto carteziano\n",
+        "B = iprod(range(n), range(-1,m)) \n",
+        "\n",
+        "x = var('x', A) # criar variável de produção\n",
+        "y = var('y', B) # criar variável de estoque\n",
+        "S = var('S', A, bool)\n",
+        "\n",
+        "\n",
+        "minimize(sum(CP[i][j]*x[i,j] + CE[i][j]*y[i,j] + CR[i][j]*S[i,j] for i,j in A))\n",
+        "\n",
+        "#restrição\n",
+        "\n",
+        "for i,j in A:\n",
+        "  x[i,j]+y[i,j-1] - y[i,j] == D[i][j]\n",
+        "\n",
+        "for i in range(n):\n",
+        "  y[i,-1] == 0 # o estoque tem que zerar\n",
+        "\n",
+        "for i, j in A:\n",
+        "  x[i,j]<= 10000*S[i,j]\n",
+        "  \n",
+        "solve()\n",
+        "\n",
+        "print ('Valor Ótimo ={}', format(vobj()))\n",
+        "\n",
+        "for i,j in A:\n",
+        "  print('x[{0},{1}]={2}    y[{0},{1}]={3} e S[{0},{1}]={4}'.format(i+1,j+1,x[i,j].primal,y[i,j].primal, S[i,j].primal))\n",
+        "  \n",
+        "\n",
+        "\n",
+        "\n"
+      ],
+      "execution_count": 33,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "__del__ is deleting problem: modelo\n",
+            "Min : 1720 * x[0,0] + 230 * y[0,0] + 100 * S[0,0] + 1690 * x[0,1] + 200 * y[0,1] + 150 * S[0,1] + 1950 * x[0,2] + 200 * y[0,2] + 200 * S[0,2] + 1700 * x[1,0] + 200 * y[1,0] + 200 * S[1,0] + 1850 * x[1,1] + 190 * y[1,1] + 190 * S[1,1] + 2000 * x[1,2] + 210 * y[1,2] + 210 * S[1,2]\n",
+            "R1: (x[0,0] + y[0,-1] - y[0,0]==1.3)\n",
+            "R2: (x[0,1] + y[0,0] - y[0,1]==2)\n",
+            "R3: (x[0,2] + y[0,1] - y[0,2]==2.5)\n",
+            "R4: (x[1,0] + y[1,-1] - y[1,0]==2.3)\n",
+            "R5: (x[1,1] + y[1,0] - y[1,1]==3.3)\n",
+            "R6: (x[1,2] + y[1,1] - y[1,2]==2.1)\n",
+            "R7: x[0,0] - 10000 * S[0,0] <= 0\n",
+            "R8: x[0,1] - 10000 * S[0,1] <= 0\n",
+            "R9: x[0,2] - 10000 * S[0,2] <= 0\n",
+            "R10: x[1,0] - 10000 * S[1,0] <= 0\n",
+            "R11: x[1,1] - 10000 * S[1,1] <= 0\n",
+            "R12: x[1,2] - 10000 * S[1,2] <= 0\n",
+            "Valor Ótimo ={} 25280.0\n",
+            "x[1,1]=1.3    y[1,1]=0.0 e S[1, 1]=1.0\n",
+            "x[1,2]=4.5    y[1,2]=2.5 e S[1, 2]=1.0\n",
+            "x[1,3]=0.0    y[1,3]=0.0 e S[1, 3]=0.0\n",
+            "x[2,1]=2.3    y[2,1]=0.0 e S[2, 1]=1.0\n",
+            "x[2,2]=5.4    y[2,2]=2.1 e S[2, 2]=1.0\n",
+            "x[2,3]=0.0    y[2,3]=0.0 e S[2, 3]=0.0\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "60CHM6BozggL",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "from pymprog import*\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n",
+        "D = [[1.3,2,2.5],\n",
+        "     [2.3,3.3,2.1]]#DEMANDA\n",
+        "\n",
+        "CP = [[1720,1690,1950],\n",
+        "     [1700,1850,2000]]#CUSTO DE PRODUÇÃO\n",
+        "\n",
+        "CE = [[230,200,200],\n",
+        "     [200,190,210]]#CUSTO DE ESTOQUE\n",
+        "\n",
+        "\n",
+        "n = 2 # numero de ligas\n",
+        "m = 3 # numero de período\n",
+        "\n",
+        "#modelo\n",
+        "\n",
+        "begin('modelo')\n",
+        "verbose(True)# cria mais informação do modelo\n",
+        "\n",
+        "A = iprod(range(n), range(m)) #iprod faz o produto carteziano\n",
+        "B = iprod(range(n), range(-1,m)) \n",
+        "\n",
+        "x = var('x', A) # criar variável de produção\n",
+        "y = var('y', B) # criar variável de estoque\n",
+        "\n",
+        "minimize(sum(CP[i][j]*x[i,j] + CE[i][j]*y[i,j] for i,j in A))\n",
+        "\n",
+        "#restrição\n",
+        "\n",
+        "for i,j in A:\n",
+        "  x[i,j]+y[i,j-1] - y[i,j] == D[i][j]\n",
+        "\n",
+        "for i in range(n):\n",
+        "  y[i,-1] == 0 # o estoque tem que zerar\n",
+        "\n",
+        "solve()\n",
+        "\n",
+        "print ('Valor Ótimo ={}', format(vobj()))\n",
+        "\n",
+        "for i,j in A:\n",
+        "  print('x[{0},{1}]={2} e y[{0},{1}]={3}'.format(i+1,j+1,x[i,j].primal,y[i,j].primal))\n",
+        "  "
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "OucchiTKdFCs",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        ""
+      ],
+      "execution_count": 0,
+      "outputs": []
+    }
+  ]
+}
